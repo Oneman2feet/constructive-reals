@@ -1,10 +1,6 @@
 #require "zarith";;
 
-(* Faster bignum arithmetic *)
-let ( * ) = Z.mul;;
-let ( + ) = Z.add;;
-let ( - ) = Z.sub;;
-let ( / ) = Z.div;;
+(* Faster bignum initialization *)
 let (~$) = Z.of_int;;
 
 (* Convenience methods for Integers *)
@@ -28,7 +24,21 @@ module R =
       (* TODO: implement long division with bignums for more precision *)
       let to_float x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
       let println_decimal x n = print_string "\n", print_float (to_float x n)
+      (* TODO: implement sum of list to remove inefficiencies *)
+      (* TODO: implement generalized acceleration method *)
+      let add a b = function n ->
+        let four = Q.of_bigint ~$4 in
+        let four_n = Z.mul ~$4 n in
+        Q.div (Q.mul (Q.add (a four_n) (b four_n)) four) four
     end;;
 
+(* Faster Reals arithmetic *)
+(*let ( * ) = R.mul;;*)
+let ( + ) = R.add;;
+(*let ( - ) = R.sub;;
+let ( / ) = R.div;;*)
+
 print_string "approximate value of e: ";;
-R.println_decimal R.e ~$100;;
+R.println_decimal R.e ~$10;;
+print_string "adding one to e: ";;
+R.println_decimal (R.e + R.one) ~$10;;
