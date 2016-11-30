@@ -4,6 +4,7 @@
 let (~$) = Z.of_int;;
 
 (* Convenience methods for Integers *)
+let max a b = if Z.gt a b then a else b;;
 let rec factorial x = if Z.leq x Z.zero then Z.one else
   Z.mul x (factorial (Z.pred x));;
 
@@ -31,7 +32,14 @@ module R =
         Q.div (Q.mul (x two_k_n) two_k) two_k
       (* TODO: implement sum of list to remove inefficiencies *)
       let add a b = accel ~$2 (function n -> Q.add (a n) (b n))
-      let mul a b = accel ~$2 (function n -> Q.add (a n) (b n))
+      (* TODO: figure out accuracy guarantees *)
+      let mul a b =
+        let bound x =
+          let two  = Q.of_bigint ~$2 in
+          let four = Q.of_bigint ~$4 in
+          Q.to_bigint (Q.div (Q.add (Q.abs (x Z.one)) four) two) in
+        let k = Z.add (Z.mul ~$2 (max (bound a) (bound b))) Z.one in
+        accel k (function n -> Q.mul (a n) (b n))
     end;;
 
 (* Faster Reals arithmetic *)
@@ -44,5 +52,5 @@ print_string "approximate value of e: ";;
 R.println_decimal R.e ~$100;;
 print_string "adding one to e: ";;
 R.println_decimal (R.e + R.one) ~$10;;
-print_string "adding one to e: ";;
-R.println_decimal (R.e * R.one) ~$10;;
+print_string "multiplying e by one: ";;
+R.println_decimal (R.e * R.one) ~$1;;
