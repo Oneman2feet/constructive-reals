@@ -24,21 +24,25 @@ module R =
       (* TODO: implement long division with bignums for more precision *)
       let to_float x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
       let println_decimal x n = print_string "\n", print_float (to_float x n)
+      (* Arithmetic helper method *)
+      let accel k x = function n ->
+        let two_k = (Q.of_bigint (Z.mul ~$2 k)) in
+        let two_k_n = (Z.mul (Z.mul ~$2 k) n) in
+        Q.div (Q.mul (x two_k_n) two_k) two_k
       (* TODO: implement sum of list to remove inefficiencies *)
-      (* TODO: implement generalized acceleration method *)
-      let add a b = function n ->
-        let four = Q.of_bigint ~$4 in
-        let four_n = Z.mul ~$4 n in
-        Q.div (Q.mul (Q.add (a four_n) (b four_n)) four) four
+      let add a b = accel ~$2 (function n -> Q.add (a n) (b n))
+      let mul a b = accel ~$2 (function n -> Q.add (a n) (b n))
     end;;
 
 (* Faster Reals arithmetic *)
-(*let ( * ) = R.mul;;*)
+let ( * ) = R.mul;;
 let ( + ) = R.add;;
 (*let ( - ) = R.sub;;
 let ( / ) = R.div;;*)
 
 print_string "approximate value of e: ";;
-R.println_decimal R.e ~$10;;
+R.println_decimal R.e ~$100;;
 print_string "adding one to e: ";;
 R.println_decimal (R.e + R.one) ~$10;;
+print_string "adding one to e: ";;
+R.println_decimal (R.e * R.one) ~$10;;
