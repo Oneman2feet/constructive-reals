@@ -1,13 +1,9 @@
 #require "zarith";;
 
-(*
-let ( * ) = mult_big_int;;
-let ( + ) = add_big_int;;
-let ( - ) = sub_big_int;;
-let ( / ) = div_big_int;;
-let ( =~) = eq_big_int;;
+let ( * ) = Z.mul;;
+let ( + ) = Z.add;;
+let ( - ) = Z.sub;;
+let ( / ) = Z.div;;
+let (~$) = Z.of_int;;
 
-print_endline "hello"
-*)
-
-print_string(Z.to_string Z.one)
+print_string (Z.to_string (~$5 * ~$10))
