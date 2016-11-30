@@ -27,13 +27,8 @@ module R =
       let to_string x n = Q.to_string (x n)
       (* TODO: implement long division with bignums for more precision *)
       let to_float x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
-      let print_decimal x n = print_float (to_float x n)
+      let println_decimal x n = print_string "\n", print_float (to_float x n)
     end;;
 
-print_string (R.to_string (R.of_int 5) ~$100);;
-
-print_string "\n";;
-
-R.print_decimal R.e ~$100;;
-
-print_string "\n";;
+print_string "approximate value of e: ";;
+R.println_decimal R.e ~$100;;
