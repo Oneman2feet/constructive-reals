@@ -9,6 +9,7 @@ let rec factorial x = if Z.leq x Z.zero then Z.one else
   Z.mul x (factorial (Z.pred x));;
 
 (* Convinience methods for Rationals *)
+let q_of_zs a b = Q.div (Q.of_bigint a) (Q.of_bigint b);;
 let rec summation first last f = if Z.equal first last then Q.zero else
   Q.add (f first) (summation (Z.succ first) last f);;
 
@@ -51,6 +52,13 @@ module R =
         Q.mul (a two_k_n) (b two_k_n)
       (* Division *)
       let div a b = mul a (inv b)
+      (* Square root *)
+      let sqrt x n =
+        let accel_n = Z.pow n 10 in (* TODO: figure out right accel *)
+        let two_accel_n = Z.mul ~$2 accel_n in
+        let x_n = x accel_n in
+        let a = Z.div (Z.mul (Q.num x_n) two_accel_n) (Q.den x_n) in
+        q_of_zs (Z.sqrt (Z.mul a two_accel_n)) two_accel_n
 
       (* Convenience methods *)
       let println_decimal x n = print_string "\n", print_float (to_float x n)
