@@ -21,13 +21,14 @@ module R =
       (* Built-in values *)
       let zero n = Q.zero
       let one n  = Q.one
-      let e n = summation Z.zero n
+      let e n = summation Z.zero (Z.add n ~$3)
         (function i -> Q.inv (Q.of_bigint (factorial i)))
-      let pi n = Q.mul (Q.of_bigint ~$4) (summation Z.zero n
+      let pi n = summation Z.zero (Z.mul ~$500 n)
         (function k ->
-          let sign = Q.of_bigint (if (Z.is_odd k) then Z.minus_one else Z.one) in
-          Q.mul sign (Q.inv (Q.of_bigint (Z.succ (Z.mul ~$2 k))))
-        ))
+          let four_k = (Z.mul ~$4 k) in
+          Q.div (Q.of_bigint ~$8)
+            (Q.of_bigint (Z.mul (Z.succ four_k) (Z.add four_k ~$3)))
+        )
 
       (* Casting between types *)
       let of_int    x n = Q.of_int x
