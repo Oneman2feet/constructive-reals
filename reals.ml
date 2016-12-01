@@ -37,7 +37,7 @@ module R =
         let bound x =
           let two  = Q.of_bigint ~$2 in
           let four = Q.of_bigint ~$4 in
-          Q.to_bigint (Q.div (Q.add (Q.abs (x Z.one)) four) two) in
+          Z.succ (Q.to_bigint (Q.div (Q.add (Q.abs (x Z.one)) four) two)) in
         let k = Z.add (Z.mul ~$2 (max (bound a) (bound b))) Z.one in
         accel k (function n -> Q.mul (a n) (b n))
     end;;

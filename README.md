@@ -7,6 +7,12 @@ How To Run
 
     utop reals.ml
 
+OR
+
+    utop
+    #use "reals.ml"
+    <experiment with the R module>
+
 Setup for MacOSX
 ================
 
