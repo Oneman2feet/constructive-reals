@@ -62,6 +62,21 @@ let ( + ) = R.add;;
 let ( - ) = R.sub;;
 let ( / ) = R.div;;
 
+(* Faster input of integers *)
+let one   = R.one;;
+let two   = one+one;;
+let three = two+one;;
+let four  = three+one;;
+let five  = four+one;;
+let six   = five+one;;
+let seven = six+one;;
+let eight = seven+one;;
+let nine  = eight+one;;
+let ten   = nine+one;;
+
+(* Faster printing of decimal approximation to 10 places *)
+let (~>) x = R.println_decimal x ~$10;;
+
 (* Tests *)
 (*
 print_string "approximate value of e: ";;
