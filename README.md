@@ -10,8 +10,9 @@ How To Run
 OR
 
     utop
-    #use "reals.ml"
+    #use "reals.ml";;
     <experiment with the R module>
+    R.println_decimal R.e ~$10;;
 
 Setup for MacOSX
 ================
