@@ -25,21 +25,16 @@ module R =
       (* TODO: implement long division with bignums for more precision *)
       let to_float x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
       let println_decimal x n = print_string "\n", print_float (to_float x n)
-      (* Arithmetic helper method *)
-      let accel k x = function n ->
-        let two_k = (Q.of_bigint (Z.mul ~$2 k)) in
-        let two_k_n = (Z.mul (Z.mul ~$2 k) n) in
-        Q.div (Q.mul (x two_k_n) two_k) two_k
-      (* TODO: implement sum of list to remove inefficiencies *)
-      let add a b = accel ~$2 (function n -> Q.add (a n) (b n))
-      (* TODO: figure out accuracy guarantees *)
-      let mul a b =
+      let add a b n =
+        let two_n = (Z.mul ~$2 n) in
+        Q.add (a two_n) (b two_n)
+      let mul a b n =
         let bound x =
           let two  = Q.of_bigint ~$2 in
-          let four = Q.of_bigint ~$4 in
-          Z.succ (Q.to_bigint (Q.div (Q.add (Q.abs (x Z.one)) four) two)) in
-        let k = Z.add (Z.mul ~$2 (max (bound a) (bound b))) Z.one in
-        accel k (function n -> Q.mul (a n) (b n))
+          Z.succ (Q.to_bigint (Q.add (Q.abs (x Z.one)) two)) in
+        let k = max (bound a) (bound b) in
+        let two_k_n = Z.mul (Z.mul ~$2 k) n in
+        Q.mul (a two_k_n) (b two_k_n)
     end;;
 
 (* Faster Reals arithmetic *)
