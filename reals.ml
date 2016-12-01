@@ -23,13 +23,27 @@ module R =
       let one n  = Q.one
       let e n = summation Z.zero n
         (function i -> Q.inv (Q.of_bigint (factorial i)))
+      let pi n = Q.mul (Q.of_bigint ~$4) (summation Z.zero n
+        (function k ->
+          let sign = Q.of_bigint (if (Z.is_odd k) then Z.minus_one else Z.one) in
+          Q.mul sign (Q.inv (Q.of_bigint (Z.succ (Z.mul ~$2 k))))
+        ))
 
       (* Casting between types *)
       let of_int    x n = Q.of_int x
       let of_bigint x n = Q.of_bigint x
       let to_string x n = Q.to_string (x n)
-      (* TODO: implement long division with bignums for more precision *)
-      let to_float x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
+      let to_float  x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
+      (* Useful for printing to a certain number of decimal digits *)
+      let to_decimal x digits =
+        let n = Z.of_int digits in
+        let characteristic = Q.to_bigint (x n) in
+        let size_of_digits = power (Q.of_int 10) (Z.of_int digits) in
+        let mantissa = Z.rem
+          (Q.to_bigint (Q.mul (x n) size_of_digits))
+          (Z.mul characteristic (Q.to_bigint size_of_digits)) in
+        (Z.to_string characteristic)^"."^(Z.to_string mantissa)
+
 
       (* ------- UNARY OPERATIONS -------- *)
       (* Negation *)
@@ -44,7 +58,8 @@ module R =
           let two_k_minus_two = Z.sub (Z.mul ~$2 k) ~$2 in
           Q.mul sign (Q.div
             (power (x n) two_k_minus_two)
-            (Q.of_bigint (factorial two_k_minus_two)))
+            (Q.of_bigint (factorial two_k_minus_two))
+          )
         )
 
       (* ------- BINARY OPERATIONS -------- *)
@@ -96,3 +111,10 @@ let ten   = nine+one;;
 
 (* Faster printing of decimal approximation to 10 places *)
 let (~>) x = R.println_decimal x ~$10;;
+
+(* Inline to_decimal. Usage:
+ *     utop # R.sqrt two + R.e =~ 5;;
+ *     - : string = "4.13249"
+ * is a string containing [root 2 plus e] to 10 decimal places
+ *)
+let (=~) = R.to_decimal;;
