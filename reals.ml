@@ -10,6 +10,8 @@ let rec factorial x = if Z.leq x Z.zero then Z.one else
 
 (* Convinience methods for Rationals *)
 let q_of_zs a b = Q.div (Q.of_bigint a) (Q.of_bigint b);;
+let rec power x n = if Z.leq n Z.zero then Q.one else
+  Q.mul x (power x (Z.pred n));;
 let rec summation first last f = if Z.equal first last then Q.zero else
   Q.add (f first) (summation (Z.succ first) last f);;
 
@@ -34,6 +36,16 @@ module R =
       let neg x n = Q.neg (x n)
       (* Inversion *)
       let inv x n = Q.inv (x n)
+      (* Cosine *)
+      (* TODO: figure out if floating point is causing issues, fix accel *)
+      let cos x n = summation Z.one n
+        (function k ->
+          let sign = Q.of_bigint (if (Z.is_odd k) then Z.one else Z.minus_one) in
+          let two_k_minus_two = Z.sub (Z.mul ~$2 k) ~$2 in
+          Q.mul sign (Q.div
+            (power (x n) two_k_minus_two)
+            (Q.of_bigint (factorial two_k_minus_two)))
+        )
 
       (* ------- BINARY OPERATIONS -------- *)
       (* Addition *)
@@ -84,13 +96,3 @@ let ten   = nine+one;;
 
 (* Faster printing of decimal approximation to 10 places *)
 let (~>) x = R.println_decimal x ~$10;;
-
-(* Tests *)
-(*
-print_string "approximate value of e: ";;
-R.println_decimal R.e ~$100;;
-print_string "adding one to e: ";;
-R.println_decimal (R.e + R.one) ~$10;;
-print_string "multiplying e by one: ";;
-R.println_decimal (R.e * R.one) ~$1;;
-*)
