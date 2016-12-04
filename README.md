@@ -11,16 +11,14 @@ How To Run
 
 To compute e to 500 decimal places:
 
-    utop # R.e =~ 500;;;
+    R.e =~ 500;;;
 
 Setup for MacOSX
 ================
 
-```brew install opam```
-
-```opam init```
-
-```opam install zarith```
+    brew install opam
+    opam init
+    opam install zarith
 
 ## e to 1000 decimal places as computed by reals.ml
 
