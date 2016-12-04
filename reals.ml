@@ -5,13 +5,15 @@ let (~$) = Z.of_int;;
 
 (* Convenience methods for Integers *)
 let max a b = if Z.gt a b then a else b;;
+let rec powZ x n = if Z.(leq n zero) then Z.one else
+  Z.mul x (powZ x (Z.pred n));;
 let rec factorial x = Z.(if leq x zero then one else
   mul x (factorial (pred x)));;
 
 (* Convinience methods for Rationals *)
 let q_of_zs a b = Q.(div (of_bigint a) (of_bigint b));;
-let rec power x n = if Z.(leq n zero) then Q.one else
-  Q.mul x (power x (Z.pred n));;
+let rec powQ x n = if Z.(leq n zero) then Q.one else
+  Q.mul x (powQ x (Z.pred n));;
 let rec summation first last f = if Z.equal first last then Q.zero else
   Q.add (f first) (summation (Z.succ first) last f);;
 
@@ -21,7 +23,8 @@ module R =
       (* Built-in values *)
       let zero n = Q.zero
       let one n  = Q.one
-      let e n = summation Z.zero (Z.add n ~$3)
+      (* Consider using the inverse factorial of n *)
+      let e n = summation Z.zero Z.(of_int (log2up n))
         (function i -> Q.(inv (of_bigint (factorial i))))
       let pi n = summation Z.zero (Z.mul ~$500 n)
         (function k ->
@@ -37,9 +40,9 @@ module R =
       let to_float  x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
       (* Useful for printing to a certain number of decimal digits *)
       let to_decimal x digits =
-        let n = Z.of_int digits in
+        let n = powZ ~$10 Z.(add (of_int digits) ~$1) in
         let characteristic = Q.to_bigint (x n) in
-        let size_of_digits = power (Q.of_int 10) (Z.of_int digits) in
+        let size_of_digits = powQ (Q.of_int 10) (Z.of_int digits) in
         let mantissa = Z.rem
           (Q.to_bigint (Q.mul (x n) size_of_digits))
           (Z.mul characteristic (Q.to_bigint size_of_digits)) in
@@ -58,7 +61,7 @@ module R =
           let sign = Q.of_bigint Z.(if is_odd k then one else minus_one) in
           let two_k_minus_two = Z.(sub (mul ~$2 k) ~$2) in
           Q.mul sign (Q.div
-            (power (x n) two_k_minus_two)
+            (powQ (x n) two_k_minus_two)
             (Q.of_bigint (factorial two_k_minus_two))
           )
         )

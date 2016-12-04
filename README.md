@@ -5,30 +5,23 @@ Start with arbitrary-precision integers: http://forge.ocamlcore.org/projects/zar
 How To Run
 ==========
 
-    utop reals.ml
-
-OR
-
     utop
     #use "reals.ml";;
     <experiment with the R module>
-    R.println_decimal R.e ~$10;;
+
+To compute e to 500 decimal places:
+
+    utop # R.e =~ 500;;;
 
 Setup for MacOSX
 ================
-
-    opam init -a -y --comp 4.03.0
-    eval `opam config env`
-    opam install -y utop ounit qcheck yojson lwt menhir
-
-```brew install gmp```
 
 ```brew install opam```
 
 ```opam init```
 
-```opam install conf-gmp``` (you may be able to skip this)
-
 ```opam install zarith```
 
-```opam install oasis```
+## e to 500 decimal places as computed by reals.ml
+
+2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901157383418793070215408914993488416750924476146066808226480016847741185374234544243710753907774499206955170276183860626133138458300075204493382656029760673711320070932870912744374704723069697720931014169283681902551510865746377211125238978442505695369677078544996996794686445490598793163688923009879312
