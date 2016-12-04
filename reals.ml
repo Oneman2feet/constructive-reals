@@ -5,12 +5,12 @@ let (~$) = Z.of_int;;
 
 (* Convenience methods for Integers *)
 let max a b = if Z.gt a b then a else b;;
-let rec factorial x = if Z.leq x Z.zero then Z.one else
-  Z.mul x (factorial (Z.pred x));;
+let rec factorial x = Z.(if leq x zero then one else
+  mul x (factorial (pred x)));;
 
 (* Convinience methods for Rationals *)
-let q_of_zs a b = Q.div (Q.of_bigint a) (Q.of_bigint b);;
-let rec power x n = if Z.leq n Z.zero then Q.one else
+let q_of_zs a b = Q.(div (of_bigint a) (of_bigint b));;
+let rec power x n = if Z.(leq n zero) then Q.one else
   Q.mul x (power x (Z.pred n));;
 let rec summation first last f = if Z.equal first last then Q.zero else
   Q.add (f first) (summation (Z.succ first) last f);;
@@ -22,7 +22,7 @@ module R =
       let zero n = Q.zero
       let one n  = Q.one
       let e n = summation Z.zero (Z.add n ~$3)
-        (function i -> Q.inv (Q.of_bigint (factorial i)))
+        (function i -> Q.(inv (of_bigint (factorial i))))
       let pi n = summation Z.zero (Z.mul ~$500 n)
         (function k ->
           let four_k = (Z.mul ~$4 k) in
@@ -55,8 +55,8 @@ module R =
       (* TODO: figure out if floating point is causing issues, fix accel *)
       let cos x n = summation Z.one n
         (function k ->
-          let sign = Q.of_bigint (if (Z.is_odd k) then Z.one else Z.minus_one) in
-          let two_k_minus_two = Z.sub (Z.mul ~$2 k) ~$2 in
+          let sign = Q.of_bigint Z.(if is_odd k then one else minus_one) in
+          let two_k_minus_two = Z.(sub (mul ~$2 k) ~$2) in
           Q.mul sign (Q.div
             (power (x n) two_k_minus_two)
             (Q.of_bigint (factorial two_k_minus_two))
@@ -66,7 +66,7 @@ module R =
       (* ------- BINARY OPERATIONS -------- *)
       (* Addition *)
       let add a b n =
-        let two_n = (Z.mul ~$2 n) in
+        let two_n = Z.mul ~$2 n in
         Q.add (a two_n) (b two_n)
       (* Subtraction *)
       let sub a b = add a (neg b)
