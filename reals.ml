@@ -20,6 +20,8 @@ let rec summation first last f = if Z.equal first last then Q.zero else
 (* Real Numbers *)
 module R =
     struct
+      type t = Z.t -> Q.t
+
       (* Built-in values *)
       let zero n = Q.zero
       let one n  = Q.one
@@ -43,11 +45,12 @@ module R =
         let n = powZ ~$10 Z.(add (of_int digits) ~$1) in
         let characteristic = Q.to_bigint (x n) in
         let size_of_digits = powQ (Q.of_int 10) (Z.of_int digits) in
-        let mantissa = Z.rem
-          (Q.to_bigint (Q.mul (x n) size_of_digits))
-          (Z.mul characteristic (Q.to_bigint size_of_digits)) in
-        (Z.to_string characteristic)^"."^(Z.to_string mantissa)
-
+        let scaled_up = Q.(to_bigint (mul (x n) size_of_digits)) in
+        let sign = if Z.(equal characteristic zero) && Z.(lt scaled_up zero)
+          then "-" else "" in
+        let mantissa = if Z.(equal characteristic zero) then Z.abs scaled_up else
+          Z.rem scaled_up (Z.mul characteristic (Q.to_bigint size_of_digits)) in
+        sign^(Z.to_string characteristic)^"."^(Z.to_string mantissa)
 
       (* ------- UNARY OPERATIONS -------- *)
       (* Negation *)
@@ -55,7 +58,6 @@ module R =
       (* Inversion *)
       let inv x n = Q.inv (x n)
       (* Cosine *)
-      (* TODO: figure out if floating point is causing issues, fix accel *)
       let cos x n = summation Z.one n
         (function k ->
           let sign = Q.of_bigint Z.(if is_odd k then one else minus_one) in
