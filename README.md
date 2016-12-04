@@ -16,8 +16,18 @@ To compute e to 500 decimal places:
 Setup for MacOSX
 ================
 
+To run these files you need OCaml and Zarith 1.4.1
+
+If you don't have opam already:
+
     brew install opam
     opam init
+    opam install zarith
+
+If you already have opam, make sure it's up to date:
+
+    opam update
+    opam upgrade
     opam install zarith
 
 ## e to 1000 decimal places as computed by reals.ml
