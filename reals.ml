@@ -19,9 +19,6 @@ let eight = seven+one;;
 let nine  = eight+one;;
 let ten   = nine+one;;
 
-(* Faster printing of decimal approximation to 10 places *)
-let (~>) x = R.println_decimal x ~$10;;
-
 (* Inline to_decimal. Usage:
  *     utop # R.sqrt two + R.e =~ 5;;
  *     - : string = "4.13249"

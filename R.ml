@@ -27,12 +27,12 @@ module R =
       type t = Z.t -> Q.t
 
       (* Built-in values *)
-      let zero n = Q.zero
-      let one n  = Q.one
-      let e n = summation Z.zero (ifact (Z.mul ~$2 n))
+      let zero :t = function n -> Q.zero
+      let one  :t = function n -> Q.one
+      let e :t = function n -> summation Z.zero (ifact (Z.mul ~$2 n))
         (function i -> Q.(inv (of_bigint (factorial i))))
       (* Something is fishy with pi, look into this *)
-      let pi n = summation Z.zero (Z.mul ~$500 n)
+      let pi :t = function n -> summation Z.zero (Z.mul ~$500 n)
         (function k ->
           let four_k = (Z.mul ~$4 k) in
           Q.div (Q.of_bigint ~$8)
@@ -40,13 +40,11 @@ module R =
         )
 
       (* Casting between types *)
-      let of_int      x n = Q.of_int x
-      let of_bigint   x n = Q.of_bigint x
-      let of_rational x n = x
-      let to_string x n = Q.to_string (x n)
-      let to_float  x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
+      let of_int      (x:int) :t = function n -> Q.of_int x
+      let of_bigint   (x:Z.t) :t = function n -> Q.of_bigint x
+      let of_rational (x:Q.t) :t = function n -> x
       (* Useful for printing to a certain number of decimal digits *)
-      let to_decimal x digits =
+      let to_decimal (x:t) (digits:int) : string =
         let n = powZ ~$10 Z.(add (of_int digits) ~$1) in
         let characteristic = Q.to_bigint (x n) in
         let size_of_digits = powQ (Q.of_int 10) (Z.of_int digits) in
@@ -61,11 +59,17 @@ module R =
 
       (* ------- UNARY OPERATIONS -------- *)
       (* Negation *)
-      let neg x n = Q.neg (x n)
+      let neg (x:t) :t = function n -> Q.neg (x n)
       (* Inversion *)
-      let inv x n = Q.inv (x n)
+      let inv (x:t) :t = function n ->
+        let rec find_big_n i =
+          if Q.geq (Q.abs (x i)) (Q.inv (Q.of_bigint i)) then i
+          else find_big_n (Z.succ i) in
+        let big_n = find_big_n n in
+        if Z.lt n big_n then Q.inv (x (Z.pow big_n 3))
+        else Q.inv (x (Z.mul n (Z.pow big_n 2)))
       (* Cosine *)
-      let cos x n = summation Z.one n
+      let cos (x:t) :t = function n -> summation Z.one n
         (function k ->
           let sign = Q.of_bigint Z.(if is_odd k then one else minus_one) in
           let two_k_minus_two = Z.(sub (mul ~$2 k) ~$2) in
@@ -77,13 +81,13 @@ module R =
 
       (* ------- BINARY OPERATIONS -------- *)
       (* Addition *)
-      let add a b n =
+      let add (a:t) (b:t) :t = function n ->
         let two_n = Z.mul ~$2 n in
         Q.add (a two_n) (b two_n)
       (* Subtraction *)
-      let sub a b = add a (neg b)
+      let sub (a:t) (b:t) :t = add a (neg b)
       (* Multiplication *)
-      let mul a b n =
+      let mul (a:t) (b:t) :t = function n ->
         let bound x =
           let two  = Q.of_bigint ~$2 in
           Z.succ (Q.to_bigint (Q.add (Q.abs (x Z.one)) two)) in
@@ -91,15 +95,12 @@ module R =
         let two_k_n = Z.mul (Z.mul ~$2 k) n in
         Q.mul (a two_k_n) (b two_k_n)
       (* Division *)
-      let div a b = mul a (inv b)
+      let div (a:t) (b:t) :t = mul a (inv b)
       (* Square root *)
-      let sqrt x n =
+      let sqrt (x:t) :t = function n ->
         let accel_n = Z.pow n 10 in (* TODO: figure out right accel *)
         let two_accel_n = Z.mul ~$2 accel_n in
         let x_n = x accel_n in
         let a = Z.div (Z.mul (Q.num x_n) two_accel_n) (Q.den x_n) in
         q_of_zs (Z.sqrt (Z.mul a two_accel_n)) two_accel_n
-
-      (* Convenience methods *)
-      let println_decimal x n = print_string "\n", print_float (to_float x n)
     end;;
