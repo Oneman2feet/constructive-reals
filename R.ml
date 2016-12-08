@@ -31,6 +31,7 @@ module R =
       let one n  = Q.one
       let e n = summation Z.zero (ifact (Z.mul ~$2 n))
         (function i -> Q.(inv (of_bigint (factorial i))))
+      (* Something is fishy with pi, look into this *)
       let pi n = summation Z.zero (Z.mul ~$500 n)
         (function k ->
           let four_k = (Z.mul ~$4 k) in
@@ -39,8 +40,9 @@ module R =
         )
 
       (* Casting between types *)
-      let of_int    x n = Q.of_int x
-      let of_bigint x n = Q.of_bigint x
+      let of_int      x n = Q.of_int x
+      let of_bigint   x n = Q.of_bigint x
+      let of_rational x n = x
       let to_string x n = Q.to_string (x n)
       let to_float  x n = (Z.to_float (Q.num (x n))) /. (Z.to_float (Q.den (x n)))
       (* Useful for printing to a certain number of decimal digits *)
