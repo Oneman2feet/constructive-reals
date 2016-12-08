@@ -9,12 +9,16 @@ let rec powZ x n = if Z.(leq n zero) then Z.one else
   Z.mul x (powZ x (Z.pred n));;
 let rec factorial x = Z.(if leq x zero then one else
   mul x (factorial (pred x)));;
+let ifact x =
+  let rec ifactrec bound p k = if Z.lt bound p then k else
+    ifactrec bound Z.(mul p (succ k)) (Z.succ k) in
+  ifactrec x Z.one Z.one
 
 (* Convinience methods for Rationals *)
 let q_of_zs a b = Q.(div (of_bigint a) (of_bigint b));;
 let rec powQ x n = if Z.(leq n zero) then Q.one else
   Q.mul x (powQ x (Z.pred n));;
-let rec summation first last f = if Z.equal first last then Q.zero else
+let rec summation first last f = if Z.gt first last then Q.zero else
   Q.add (f first) (summation (Z.succ first) last f);;
 
 (* Real Numbers *)
@@ -25,8 +29,7 @@ module R =
       (* Built-in values *)
       let zero n = Q.zero
       let one n  = Q.one
-      (* Consider using the inverse factorial of n *)
-      let e n = summation Z.zero Z.(of_int (log2up n))
+      let e n = summation Z.zero (ifact (Z.mul ~$2 n))
         (function i -> Q.(inv (of_bigint (factorial i))))
       let pi n = summation Z.zero (Z.mul ~$500 n)
         (function k ->
